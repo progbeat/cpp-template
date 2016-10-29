@@ -39,17 +39,20 @@ struct LinearRecurrence {
     X q = 1;
     
     void preduce(vector<X> &a) const {
-        for (int n = sz(a); n -->= sz(f); a.pop_back()) {
+        for (int n = sz(a); n -->= sz(f); a.pop_back())
             FOR (i, 1, sz(f))
                 a[n - i] = sub(a[n - i], mul(a.back(), f[i]));
-        }
+    }
+    
+    void pmulx(vector<X> &a) const {
+        a.emplace(a.begin());
+        preduce(a);
     }
     
     vector<X> pmul(vector<X> &a, vector<X> &b) const {
-        vector<X> r(sz(a) + sz(b));
-        REP (i, sz(a)) REP (j, sz(b)) {
+        vector<X> r(sz(a) + sz(b) - 1);
+        REP (i, sz(a)) REP (j, sz(b))
             r[i + j] = add(r[i + j], mul(a[i], b[j]));
-        }
         preduce(r);
         return r;
     }
@@ -58,16 +61,16 @@ struct LinearRecurrence {
     
     vector<X> solve(ll from, ll to) const {
         vector<X> x = {0, 1}, r = {1};
-        for (ll n = from; n; n /= 2) {
-            if (n & 1) r = pmul(r, x);
-            x = pmul(x, x);
+        for (int i = 62; i >= 0; --i) {
+            cout << i << endl;
+            r = pmul(r, r);
+            if ((from >> i) & 1) pmulx(r);
         }
         vector<X> res;
         FOR (n, from, to) {
             res.emplace_back();
             REP (i, sz(r)) res.back() = add(res.back(), mul(r[i], s[i]));
-            r.emplace(r.begin());
-            preduce(r);
+            pmulx(r);
         }
         return res;
     }
@@ -140,8 +143,33 @@ void test2() {
     }
 }
 
+void test3() {
+    mod = 2;
+    mt19937 generator;
+    LinearRecurrence<int> r;
+    ll n = 0;
+    for (; ; ) {
+        uint32_t x = generator();
+        ++n;
+        if (!r.next(x & 1)) break;
+    }
+    cout << sz(r.f) << endl;
+    assert(sz(r.f) == 19938);
+    const int SKIP = 10000000;
+    const int N = 1000;
+    REP (k, SKIP) {
+        generator();
+        ++n;
+    }
+    vector<int> c = r.solve(n, n + N);
+    REP (k, N) {
+        uint32_t x = 0;
+        assert((generator() & 1) == c[k]);
+    }
+}
+
 int main() {
     test1();
-    test2();
+    test3();
     return 0;
 }
