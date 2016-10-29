@@ -62,7 +62,6 @@ struct LinearRecurrence {
     vector<X> solve(ll from, ll to) const {
         vector<X> x = {0, 1}, r = {1};
         for (int i = 62; i >= 0; --i) {
-            cout << i << endl;
             r = pmul(r, r);
             if ((from >> i) & 1) pmulx(r);
         }
@@ -110,40 +109,7 @@ void test1() {
     }
 }
 
-uint32_t xorshift128() {
-    static uint32_t x = 123456, y = 234567, z = 345678, w = 456789;
-    uint32_t t = x ^ (x << 11);
-    t ^= t >> 8;
-    x = y; y = z; z = w;
-    return w ^= (w >> 19) ^ t;
-}
-
 void test2() {
-    mod = 2;
-    LinearRecurrence<int> r;
-    ll n = 0;
-    for (; ; ) {
-        uint32_t x = xorshift128();
-        bool ok = true;
-        REP (i, 32) ok &= r.next((x >> i) & 1);
-        n += 32;
-        if (!ok) break;
-    }
-    const int SKIP = 10000000;
-    const int N = 100;
-    REP (k, SKIP) {
-        xorshift128();
-        n += 32;
-    }
-    vector<int> c = r.solve(n, n + 32 * N);
-    REP (k, N) {
-        uint32_t x = 0;
-        REP (i, 32) x |= c[k * 32 + i] << i;
-        assert(xorshift128() == x);
-    }
-}
-
-void test3() {
     mod = 2;
     mt19937 generator;
     LinearRecurrence<int> r;
@@ -170,6 +136,6 @@ void test3() {
 
 int main() {
     test1();
-    test3();
+    test2();
     return 0;
 }
