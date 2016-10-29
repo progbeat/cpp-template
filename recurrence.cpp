@@ -82,6 +82,7 @@ struct LinearRecurrence {
             f.resize(max(sz(f), sz(g) + m));
             X z = mul(p, inv(q));
             REP (i, sz(g)) f[i + m] = sub(f[i + m], mul(g[i], z));
+            for (; f.back() == 0; f.pop_back());
             g = t;
             q = p;
             m = 1;
