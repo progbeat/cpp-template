@@ -77,7 +77,7 @@ struct LinearRecurrence {
             g = t;
             q = p;
             m = 1;
-        } else if (++m > sz(f) + 128) {
+        } else if (++m > 128) {
             return true;
         }
         return false;
