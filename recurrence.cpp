@@ -1,4 +1,10 @@
-#include <bits/stdc++.h>
+#include <algorithm>
+#include <iostream>
+#include <cassert>
+#include <vector>
+#include <random>
+#include <map>
+
 #define UN(v) sort(all(v)), (v).erase(unique(all(v)), (v).end())
 #define FOR(i, a, b) for (decltype(a) i(a), _B_##i(b); i < _B_##i; ++i)
 #define CL(a, b) memset(a, b, sizeof a)
@@ -33,7 +39,7 @@ X qpow(X x, X n) {
 int inv(int x) { return qpow(x, mod - 2); }
 
 template <class X>
-struct LinearRecurrence {
+struct linear_recurrence {
     vector<X> s, f = {1}, g = {1};
     int m = 1;
     X q = 1;
@@ -97,7 +103,7 @@ struct LinearRecurrence {
 
 void test1() {
     mod = 1e9 + 7;
-    LinearRecurrence<int> a;
+    linear_recurrence<int> a;
     auto f = [](ll x) {
         return qpow(x % mod, x % 10);
     };
@@ -112,7 +118,7 @@ void test1() {
 void test2() {
     mod = 2;
     mt19937 generator;
-    LinearRecurrence<int> r;
+    linear_recurrence<int> r;
     ll n = 0;
     for (; ; ) {
         uint32_t x = generator();
@@ -129,7 +135,6 @@ void test2() {
     }
     vector<int> c = r.solve(n, n + N);
     REP (k, N) {
-        uint32_t x = 0;
         assert((generator() & 1) == c[k]);
     }
 }

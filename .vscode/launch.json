@@ -1,0 +1,29 @@
+{
+        "version": "0.2.0",
+        "configurations": [
+            {
+                "name": "Launch Program",
+                "type": "cppdbg",
+                "request": "launch",
+                "program": "${workspaceRoot}/.bin/Release/${fileBasenameNoExtension}",
+                "args": [],
+                "stopAtEntry": false,
+                "cwd": "${workspaceRoot}",
+                "environment": [],
+                "externalConsole": true,
+                "MIMode": "lldb"
+            },
+            {
+                "name": "Launch",
+                "type": "cppdbg",
+                "request": "launch",
+                "program": "enter program name, for example ${workspaceRoot}/a.out",
+                "args": [],
+                "stopAtEntry": false,
+                "cwd": "${workspaceRoot}",
+                "environment": [],
+                "externalConsole": true,
+                "MIMode": "lldb"
+            }
+        ]
+    }
