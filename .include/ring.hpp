@@ -22,7 +22,7 @@ inline constexpr uint64_t mod_mul(uint64_t x, uint64_t y) {
 
 template <class X, X Mod>
 struct quotient_ring_element {
-    static_assert(std::is_unsigned<X>::value);
+    static_assert(std::is_unsigned<X>::value, "X should be unisgned integer type");
 
     X value;
 
