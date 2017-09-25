@@ -4,14 +4,12 @@
     "version": "2.0.0",
     "tasks": [
         {
-            "taskName": "Release",
-            "identifier": "Release",
+            "taskName": "Build",
             "type": "shell",
             "command": "make",
             "args": [
                 "build",
                 "launch",
-                "DEBUG=1",
                 "TARGET=${file}"
             ],
             "presentation": {
