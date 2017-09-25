@@ -29,13 +29,14 @@ CXXFLAGS += -march=native $(CXXSTANDARD) -Wall -fno-fast-math $(OPTIMIZATION_LEV
 
 PREFIX = $(BIN_DIR)/$(CONFIGURATION)
 
-define preprocess
-	@$(CXX) $(1) $(CXXSTANDARD) -I.include -E -C -P > $(PROJECT_DIR)/submit.cpp
-endef
+COMPILE = $(CXX) -include $(TEMPLATE_HPP) $(1) -o $(PREFIX)/$(2) $(CXXFLAGS) $(LDFLAGS) $(LDLIBS)
+RUN_CXX_PREPROCESSOR = $(CXX) $(1) $(CXXSTANDARD) -I.include -E -C -P
+REMOVE_EXTRA_EMPTY_LINES = cat -s
+MAKE_SUBMIT_CPP = { cat $(TEMPLATE_HPP); $(RUN_CXX_PREPROCESSOR); } | $(REMOVE_EXTRA_EMPTY_LINES)
 
 define compile
 	@-echo Compiling...
-	@$(CXX) -include $(TEMPLATE_HPP) $(1) -o $(PREFIX)/$(2) $(CXXFLAGS) $(LDFLAGS) $(LDLIBS)
+	@$(COMPILE) & $(MAKE_SUBMIT_CPP) > $(PROJECT_DIR)/submit.cpp
 	@-clear
 endef
 
