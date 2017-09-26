@@ -1,4 +1,5 @@
 /.bin
+*.submit.cpp
 
 # Compiled Object files
 *.slo
