@@ -12,7 +12,7 @@
                 "build",
                 "submit.cpp",
                 "launch",
-                "TARGET=${file}"
+                "FILE=${file}"
             ],
             "presentation": {
                 "echo": false,

@@ -2,12 +2,12 @@
 
 CXX             ?= c++
 
-TARGET_CPP      := $(patsubst %.submit.cpp,%.cpp,$(TARGET))
+TARGET_CPP      := $(patsubst %.submit.cpp,%.cpp,$(FILE))
 SUBMIT_CPP      := $(TARGET_CPP:.cpp=.submit.cpp)
 MAKEFILE_PATH   := $(realpath $(lastword $(MAKEFILE_LIST)))
 ROOT_DIR        := $(realpath $(dir $(lastword $(MAKEFILE_LIST))))
 BIN_DIR         ?= $(ROOT_DIR)/.bin
-INCLUDE_DIR		:= $(ROOT_DIR)/.include
+INCLUDE_DIR     := $(ROOT_DIR)/.include
 PROJECT_DIR     := $(realpath $(dir $(TARGET_CPP)))
 PROJECT_NAME    := $(basename $(notdir $(TARGET_CPP)))
 
