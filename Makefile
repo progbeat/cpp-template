@@ -38,17 +38,17 @@ $(BIN_DIR):
 
 $(BIN_DIR)/$(PROJECT_NAME): $(BIN_DIR) $(TARGET_CPP)
 	@-echo Compiling "$(TARGET_CPP)"...
-	@-rm $(SUBMIT_CPP) 2>/dev/null || true
+	@-rm $(SUBMIT_CPP) 2 >/dev/null || true
 	@$(CXX) -include $(TEMPLATE_HPP) $(TARGET_CPP) -o $@ $(CXXFLAGS) $(LDFLAGS) $(LDLIBS)
 
 $(SUBMIT_CPP): $(TARGET_CPP) $(BIN_DIR)/$(PROJECT_NAME)
 	@$(MAKE_SUBMIT_CPP) > $@
 
 build: $(BIN_DIR)/$(PROJECT_NAME) $(SUBMIT_CPP)
-	@echo >/dev/null
+	@echo > /dev/null
 
 submit.cpp: $(SUBMIT_CPP)
-	@echo >/dev/null
+	@echo > /dev/null
 
 launch: build
 	@clear

@@ -1,5 +1,4 @@
-#ifndef CPP_TEMPLATE_MATH_HPP_
-#define CPP_TEMPLATE_MATH_HPP_
+#pragma once
 
 namespace math {
 
@@ -13,5 +12,3 @@ inline enable_if_t<std::is_integral<N>::value, X> pow(X x, N n) {
 }
 
 }  // namespace math
-
-#endif  // CPP_TEMPLATE_MATH_HPP_

@@ -1,5 +1,4 @@
-#ifndef CPP_TEMPLATE_RING_HPP_
-#define CPP_TEMPLATE_RING_HPP_
+#pragma once
 
 namespace ring_algo {
 
@@ -94,5 +93,3 @@ struct quotient_ring_element {
         assert(0 <= value && value < Mod);
     }
 };
-
-#endif  // CPP_TEMPLATE_RING_HPP_

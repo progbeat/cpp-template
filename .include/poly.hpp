@@ -1,5 +1,4 @@
-#ifndef CPP_TEMPLATE_POLY_HPP_
-#define CPP_TEMPLATE_POLY_HPP_
+#pragma once
 
 template <class X>
 class poly {
@@ -44,5 +43,3 @@ inline poly<X> operator * (const poly<X>& x, const poly<X>& y) {
         r[i + j] = add(r[i + j], mul(a[i], b[j]));
     return r;
 }
-
-#endif  // CPP_TEMPLATE_POLY_HPP_

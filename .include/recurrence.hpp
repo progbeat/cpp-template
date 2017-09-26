@@ -1,5 +1,4 @@
-#ifndef CPP_TEMPLATE_RECURRENCE_HPP_
-#define CPP_TEMPLATE_RECURRENCE_HPP_
+#pragma once
 
 #include <poly.hpp>
 
@@ -65,5 +64,3 @@ struct linear_recurrence {
         return true;
     }
 };
-
-#endif  // CPP_TEMPLATE_RECURRENCE_HPP_
