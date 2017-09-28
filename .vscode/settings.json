@@ -11,6 +11,8 @@
         "__split_buffer": "cpp",
         "string": "cpp",
         "vector": "cpp",
-        "ostream": "cpp"
+        "ostream": "cpp",
+        "bitset": "cpp",
+        "iterator": "cpp"
     }
 }
