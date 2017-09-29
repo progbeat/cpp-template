@@ -11,8 +11,11 @@ MAKEFILE_PATH   := $(realpath $(lastword $(MAKEFILE_LIST)))
 ROOT_DIR        := $(realpath $(dir $(lastword $(MAKEFILE_LIST))))
 BIN_DIR         := $(ROOT_DIR)/.bin
 INCLUDE_DIR     := $(ROOT_DIR)/.include
-PROJECT_DIR     := $(realpath $(dir $(TARGET_CPP)))
-PROJECT_NAME    := $(basename $(notdir $(TARGET_CPP)))
+PROBLEM_DIR     := $(realpath $(dir $(TARGET_CPP)))
+PROBLEM_NAME    := $(basename $(notdir $(TARGET_CPP)))
+INPUT_FILE      := $(PROBLEM_DIR)/$(PROBLEM_NAME).in
+DO_NOTHING      := @echo > /dev/null
+
 CXX             ?= c++
 DEBUG           ?= 0
 
@@ -24,6 +27,19 @@ else
 	DEFINITIONS += -DNDEBUG
 endif
 
+# If input file exists redirect input to it.
+ifneq ($(wildcard $(INPUT_FILE)),) 
+    LANCH_ARGS = < $(INPUT_FILE)
+endif 
+
+ifneq ($(patsubst .%,.,$(notdir $(PROBLEM_DIR))),.)
+	FOR_SUBMIT ?= 1
+endif
+
+ifneq ($(FOR_SUBMIT),1)
+$(shell touch $(TARGET_CPP))
+endif
+
 INCLUDES = -I$(INCLUDE_DIR)
 TEMPLATE_HPP = $(INCLUDE_DIR)/template.hpp
 
@@ -32,29 +48,34 @@ CXXFLAGS += -march=native $(CXXSTANDARD) -Wall -fno-fast-math $(OPTIMIZATION_LEV
 
 COMPILE = $(CXX) -include $(TEMPLATE_HPP) $(1) -o $(BIN_DIR)/$(2) $(CXXFLAGS) $(LDFLAGS) $(LDLIBS)
 
-RUN_CXX_PREPROCESSOR = $(CXX) $(TARGET_CPP) $(CXXSTANDARD) -I.include -E -C -P
-REMOVE_EXTRA_EMPTY_LINES = cat -s
-MAKE_SUBMIT_CPP = { cat $(TEMPLATE_HPP); $(RUN_CXX_PREPROCESSOR); } | $(REMOVE_EXTRA_EMPTY_LINES)
+ifeq ($(FOR_SUBMIT),1)
+	RUN_CXX_PREPROCESSOR = $(CXX) $(TARGET_CPP) $(CXXSTANDARD) -DONLINE_JUDGE -I.include -E -C -P
+	REMOVE_EXTRA_EMPTY_LINES = cat -s
+	MAKE_SUBMIT_CPP = { cat $(TEMPLATE_HPP); $(RUN_CXX_PREPROCESSOR); } | $(REMOVE_EXTRA_EMPTY_LINES)
+	MAKE_SUBMIT_CPP += > $(SUBMIT_CPP)
+else
+	MAKE_SUBMIT_CPP = $(DO_NOTHING)
+endif
 
 $(BIN_DIR):
 	@-mkdir -p $@
 
-$(BIN_DIR)/$(PROJECT_NAME): $(BIN_DIR) $(TARGET_CPP)
+$(BIN_DIR)/$(PROBLEM_NAME): $(BIN_DIR) $(TARGET_CPP)
 	@clear
 	@-echo Compiling "$(TARGET_CPP)"...
 	@-rm $(SUBMIT_CPP) 2> /dev/null || true
 	@$(CXX) -include $(TEMPLATE_HPP) $(TARGET_CPP) -o $@ $(CXXFLAGS) $(LDFLAGS) $(LDLIBS)
 
-$(SUBMIT_CPP): $(TARGET_CPP) $(BIN_DIR)/$(PROJECT_NAME)
-	@$(MAKE_SUBMIT_CPP) > $@
+$(SUBMIT_CPP): $(TARGET_CPP) $(BIN_DIR)/$(PROBLEM_NAME)
+	@$(MAKE_SUBMIT_CPP)
 
-build: $(BIN_DIR)/$(PROJECT_NAME) $(SUBMIT_CPP)
-	@echo > /dev/null
+build: $(BIN_DIR)/$(PROBLEM_NAME) $(SUBMIT_CPP)
+	@$(DO_NOTHING)
 
 submit.cpp: $(SUBMIT_CPP)
-	@echo > /dev/null
+	@$(DO_NOTHING)
 
 launch: build
 	@clear
-	@cd $(BIN_DIR) && time $(BIN_DIR)/$(PROJECT_NAME) $(LANCH_ARGS)
+	@cd $(BIN_DIR) && time $(BIN_DIR)/$(PROBLEM_NAME) $(LANCH_ARGS)
 

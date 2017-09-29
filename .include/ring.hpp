@@ -11,13 +11,12 @@ namespace detail {
     
 template <class Z, Z Mod>
 struct static_quotient_ring_impl : quotient_ring_base<Z, true> {
-    static_assert(std::is_unsigned<Z>::value, "Z should be unisgned integer type");
     constexpr static_quotient_ring_impl() = default;
     constexpr static_quotient_ring_impl(const static_quotient_ring_impl&) = default;
     static constexpr Z mod() { return Mod; }
 };
 
-}  // namespace
+}  // namespace detail
 
 template <uint64_t Mod, class Z = std::conditional_t<(Mod > (1ull << 32)), uint64_t, uint32_t>>
 using static_quotient_ring = detail::static_quotient_ring_impl<Z, (Z)Mod>;
@@ -59,6 +58,8 @@ template <class Z, class R>
 inline constexpr Z mod_mul(const Z& x, const Z& y, const R& ring) {
     if (!std::is_integral<Z>::value) {
         return (x * y) % ring.mod();
+    } else if (R::is_static && ring.mod() == 0) {
+        return x * y;
     } else if (sizeof(Z) < sizeof(uint64_t)) {
         return (uint64_t)x * y % ring.mod();
     } else {
@@ -80,7 +81,6 @@ inline constexpr Z mod_div(const Z& x, const Z& y, const R& ring) {
 
 template <class Ring>
 struct ring_element : Ring {
-    using base = Ring;
     using value_type = typename Ring::value_type;
     
     value_type value;
@@ -91,7 +91,7 @@ struct ring_element : Ring {
 
     template <class... Args>
     constexpr ring_element(const value_type& value, Args&&... args) 
-        : base(std::forward<Args>(args)...)
+        : Ring(std::forward<Args>(args)...)
         , value(value)
     {}
 
@@ -123,6 +123,12 @@ struct ring_element : Ring {
     constexpr ring_element operator + (const ring_element& other) const {
         auto r = *this;
         return r += other;
+    }
+
+    constexpr ring_element operator - () const {
+        auto r = value_type();
+        mod_sub(r, value, ring());
+        return ring_element(r, ring());
     }
 
     constexpr ring_element operator * (ring_element other) const {

@@ -13,6 +13,9 @@
         "vector": "cpp",
         "ostream": "cpp",
         "bitset": "cpp",
-        "iterator": "cpp"
+        "iterator": "cpp",
+        "__functional_03": "cpp",
+        "__functional_base": "cpp",
+        "algorithm": "cpp"
     }
 }
