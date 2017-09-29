@@ -2,6 +2,7 @@
 #include <algorithm>
 #include <iostream>
 #include <cassert>
+#include <sstream>
 #include <vector>
 #include <random>
 #include <map>
@@ -18,4 +19,4 @@
 #define Y second
 #define X first
 
-using namespace std;
+// using namespace std;

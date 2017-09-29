@@ -23,6 +23,7 @@ using static_quotient_ring = detail::static_quotient_ring_impl<Z, (Z)Mod>;
 
 template <class Z>
 struct singleton_quotient_ring : quotient_ring_base<Z> {
+    static_assert(!std::is_signed<Z>::value, "signed integers are not supported");
     static Z& mod() { static Z mod; return mod; }
 };
 
@@ -47,7 +48,7 @@ inline constexpr void mod_sub(Z& x, const Z& y, const R& ring) {
 
 template <class Z, class R>
 inline constexpr Z mod_mul_binary(Z x, Z y, const R& ring) {
-    for (Z r(1); ; ) {
+    for (Z r = Z(); ; ) {
         if (y & 1) mod_add(r, x, ring);
         if (y /= 2) mod_add(x, x, ring);
         else return r;
