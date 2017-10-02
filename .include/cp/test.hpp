@@ -1,6 +1,7 @@
 #pragma once
 
 #include <cp/diagnostics/detail/to_string.hpp>
+#include <cp/diagnostics/detail/split_va_args.hpp>
 #include <cp/string/split.hpp>
 #include <cp/string/trim.hpp>
 
@@ -87,29 +88,7 @@ struct test_base {
     
     bool run() {
         try {
-            auto args = split(this->args(), [d = int(), q = bool(), lc = char()](char c) mutable {
-                std::swap(lc, c);
-                switch (lc) {
-                    case ',': {
-                        return d == 0 && !q;
-                    }
-                    case '"': {
-                        if (!q || c != '\\') {
-                            q = !q;
-                        }
-                        return false;
-                    }
-                    case '(': {
-                        d += !q;
-                        return false;
-                    }
-                    case ')': {
-                        d -= !q;
-                        return false;
-                    }
-                }
-                return false;
-            });
+            auto args = diagnostics::detail::split_va_args(this->args());
             for (auto& v : args) {
                 v = trim(v);
             }
