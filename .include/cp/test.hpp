@@ -1,7 +1,12 @@
 #pragma once
 
+#include <cp/diagnostics/detail/to_string.hpp>
 #include <cp/string/split.hpp>
 #include <cp/string/trim.hpp>
+
+#include <iostream>
+#include <cmath>
+#include <map>
 
 #define CONCATENATE_IMPL(x, y)  x##y
 #define CONCATENATE(x, y)       CONCATENATE_IMPL(x, y)
@@ -28,19 +33,6 @@ namespace cp { namespace tests {
 
 namespace detail {
 
-template <class T, class = decltype((std::stringstream&)(std::declval<std::stringstream>()) << std::declval<T>())>
-inline std::string to_string_impl(const T& value, int) {
-    std::stringstream ss;
-    ss << value;
-    return ss.str();
-}
-
-template <class T>
-inline std::string to_string_impl(const T&, ...) { return "<some-type>"; }
-
-template <class T>
-inline std::string to_string(const T& value) { return to_string_impl(value, 0); }
-
 struct assert_impl {
     const char* filename;
     int line;
@@ -54,7 +46,8 @@ struct assert_impl {
 #pragma clang diagnostic pop
         std::stringstream ss;
         if (!Equal) ss << "not ";
-        ss << "expected = " << detail::to_string(expected) << ", actual = " << detail::to_string(actual);
+        ss << "expected = " << diagnostics::detail::to_string(expected)
+           << ", actual = " << diagnostics::detail::to_string(actual);
         ss << "; line = " << line;
         throw ss.str();
     }

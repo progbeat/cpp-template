@@ -20,7 +20,7 @@ enum class type_kind {
     array,                  // T[], std::array
     sequence_container,     // std::vector, std::list, ...
     associative_container,  // map or set
-    container,              // any
+    container,              // sequence or associative container
     unknown
 };
 
@@ -134,25 +134,25 @@ struct is_string<const char*> : std::true_type {};
 // _v
 
 template <type_kind kind>
-struct general_kind : std::integral_constant<type_kind, type_kind::unknown> {};
+struct general_type_kind : std::integral_constant<type_kind, type_kind::unknown> {};
 
-#define MAKE_GENERAL_KIND(child, parent)        \
-    template <> struct general_kind<type_kind::child> : std::integral_constant<type_kind, type_kind::parent> {};
+#define MAKE_GENERAL_TYPE_KIND(child, parent)        \
+    template <> struct general_type_kind<type_kind::child> : std::integral_constant<type_kind, type_kind::parent> {};
  
-MAKE_GENERAL_KIND(signed_integer, integer);
-MAKE_GENERAL_KIND(unsigned_integer, integer);
-MAKE_GENERAL_KIND(integer, arithmetic);
-MAKE_GENERAL_KIND(floating_point, arithmetic);
-MAKE_GENERAL_KIND(set, associative_container);
-MAKE_GENERAL_KIND(map, associative_container);
-MAKE_GENERAL_KIND(array, sequence_container);
-MAKE_GENERAL_KIND(sequence_container, container);
-MAKE_GENERAL_KIND(associative_container, container);
+MAKE_GENERAL_TYPE_KIND(signed_integer, integer);
+MAKE_GENERAL_TYPE_KIND(unsigned_integer, integer);
+MAKE_GENERAL_TYPE_KIND(integer, arithmetic);
+MAKE_GENERAL_TYPE_KIND(floating_point, arithmetic);
+MAKE_GENERAL_TYPE_KIND(set, associative_container);
+MAKE_GENERAL_TYPE_KIND(map, associative_container);
+MAKE_GENERAL_TYPE_KIND(array, sequence_container);
+MAKE_GENERAL_TYPE_KIND(sequence_container, container);
+MAKE_GENERAL_TYPE_KIND(associative_container, container);
 
-#undef MAKE_GENERAL_KIND
+#undef MAKE_GENERAL_TYPE_KIND
 
 template <type_kind kind>
-static constexpr type_kind general_kind_v = general_kind<kind>::value;
+static constexpr type_kind general_type_kind_v = general_type_kind<kind>::value;
 
 // Helper template variables
 

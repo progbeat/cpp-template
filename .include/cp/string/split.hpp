@@ -1,5 +1,8 @@
 #pragma once
 
+#include <vector>
+#include <string>
+
 namespace cp {
 
 template <class F, class = decltype(std::declval<F>()('\0'))>
