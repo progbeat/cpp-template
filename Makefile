@@ -41,7 +41,7 @@ $(shell touch $(TARGET_CPP))
 endif
 
 INCLUDES = -I$(INCLUDE_DIR)
-TEMPLATE_HPP = $(INCLUDE_DIR)/template.hpp
+TEMPLATE_HPP = $(INCLUDE_DIR)/cp/template.hpp
 
 CXXSTANDARD = -std=c++14
 CXXFLAGS += -march=native $(CXXSTANDARD) -Wall -fno-fast-math $(OPTIMIZATION_LEVEL) $(DEFINITIONS) $(INCLUDES)

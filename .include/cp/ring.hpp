@@ -1,5 +1,7 @@
 #pragma once
 
+namespace cp {
+
 template <class Z, bool Static = false>
 struct quotient_ring_base {
     using value_type = Z;
@@ -90,6 +92,8 @@ struct ring_element : Ring {
 
     constexpr ring_element() : value(value_type()) {}
 
+    operator value_type() const { return value; }
+
     template <class... Args>
     constexpr ring_element(const value_type& value, Args&&... args) 
         : Ring(std::forward<Args>(args)...)
@@ -160,3 +164,8 @@ struct ring_element : Ring {
         assert(0 <= value && value < Mod);
     }
 };
+
+template <uint64_t Mod>
+using int_modulo = ring_element<static_quotient_ring<Mod>>;
+
+}  // namespace cp

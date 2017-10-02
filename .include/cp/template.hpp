@@ -1,3 +1,5 @@
+#include <unordered_map>
+#include <unordered_set>
 #include <stdexcept>
 #include <algorithm>
 #include <iostream>
@@ -5,7 +7,9 @@
 #include <sstream>
 #include <vector>
 #include <random>
+#include <array>
 #include <map>
+#include <set>
 
 #define UN(v) sort(all(v)), (v).erase(unique(all(v)), (v).end())
 #define FOR(i, a, b) for (decltype(a) i(a), _B_##i(b); i < _B_##i; ++i)

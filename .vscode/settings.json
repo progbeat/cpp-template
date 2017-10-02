@@ -16,6 +16,8 @@
         "iterator": "cpp",
         "__functional_03": "cpp",
         "__functional_base": "cpp",
-        "algorithm": "cpp"
+        "algorithm": "cpp",
+        "__tuple": "cpp",
+        "limits": "cpp"
     }
 }
