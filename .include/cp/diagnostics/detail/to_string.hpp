@@ -54,8 +54,7 @@ struct to_string_impl<T, type_kind::string> {
                 default  : res += c;
             }
         }
-        res += '"';
-        return res;
+        return res += '"';
     }
 };
 
@@ -69,7 +68,7 @@ struct to_string_impl<T, type_kind::sequence_container> {
             else res += ", ";
             res += to_string(v);
         }
-        return res + "]";
+        return res += "]";
     }
 };
 
@@ -90,7 +89,7 @@ struct to_string_impl<T, type_kind::map> {
             res += ": ";
             res += to_string(kv.second);
         }
-        return res + "}";
+        return res += "}";
     }
 };
 
@@ -104,7 +103,7 @@ struct to_string_impl<T, type_kind::set> {
             else res += ", ";
             res += to_string(v);
         }
-        return res + "}";
+        return res += "}";
     }
 };
 
@@ -112,6 +111,24 @@ template <class T>
 struct to_string_impl<T, type_kind::pair> {
     static std::string doit(const T& value) {
         return "(" + to_string(value.first) + ", " + to_string(value.second) + ")";
+    }
+};
+
+template <class... Ts>
+struct to_string_impl<std::tuple<Ts...>, type_kind::tuple> {
+    template <int... Indices>
+    static std::string doit(const std::tuple<Ts...>& value, std::integer_sequence<int, Indices...>) {
+        std::string tupleStr[] = {to_string(std::get<Indices>(value))...};
+        std::string res(1, '(');
+        for (int i = 0; i < sizeof...(Indices); ++i) {
+            if (i) res += ", ";
+            res += tupleStr[i];
+        }
+        return res += ")";
+    }
+
+    static std::string doit(const std::tuple<Ts...>& value) {
+        return doit(value, std::make_integer_sequence<int, sizeof...(Ts)>());
     }
 };
 
