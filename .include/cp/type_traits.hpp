@@ -156,8 +156,8 @@ static constexpr type_kind general_type_kind_v = general_type_kind<kind>::value;
 
 // Helper template variables
 
-#define MAKE_IS_TYPE_TRAIT(trait)                                           \
-    template <class T> using trait = detail::trait<std::remove_cv_t<T>>;    \
+#define MAKE_IS_TYPE_TRAIT(trait)                                                                 \
+    template <class T> using trait = detail::trait<std::remove_cv_t<std::remove_reference_t<T>>>; \
     template <class T> static constexpr auto trait##_v = trait<T>::value
 
 MAKE_IS_TYPE_TRAIT(is_container);
@@ -174,15 +174,16 @@ MAKE_IS_TYPE_TRAIT(is_string);
 
 template <class T>
 static constexpr type_kind type_kind_of = 
-    std::is_same<std::remove_cv_t<T>, bool>::value ? type_kind::boolean :
+    std::is_same<std::decay_t<T>, bool>::value ? type_kind::boolean :
     std::is_floating_point<T>::value ? type_kind::floating_point :
     std::is_signed<T>::value ? type_kind::signed_integer :
     std::is_unsigned<T>::value ? type_kind::unsigned_integer :
     is_pair_v<T> ? type_kind::pair :
     is_tuple_v<T> ? type_kind::tuple :
+    is_array_v<T> ? type_kind::array :
     is_string_v<T> ? type_kind::string :
+    is_sequence_container_v<T> ? type_kind::sequence_container :
     is_set_v<T> ? type_kind::set :
-    is_map_v<T> ? type_kind::map :
-    is_array_v<T> ? type_kind::array : type_kind::unknown;
+    is_map_v<T> ? type_kind::map : type_kind::unknown;
 
 }  // namespace cp

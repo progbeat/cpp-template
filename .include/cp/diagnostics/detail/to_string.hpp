@@ -5,10 +5,10 @@
 
 namespace cp { namespace diagnostics { namespace detail {
 
-template <class T, type_kind = type_kind_of<T>>
-struct to_string_impl;
+template <class T>
+inline std::string to_string(const T& value);
 
-template <class T, type_kind K>
+template <class T, type_kind K = type_kind_of<T>>
 struct to_string_impl : to_string_impl<T, general_type_kind_v<K>> {};
 
 template <class T, class = decltype((std::stringstream&)(std::declval<std::stringstream>()) << std::declval<T>())>
@@ -38,11 +38,24 @@ struct to_string_impl<T, type_kind::unknown> {
 };
 
 template <class T>
+struct to_string_impl<T, type_kind::boolean> {
+    static std::string doit(const T& value) { return value ? "true" : "false"; }
+};
+
+template <class T>
 struct to_string_impl<T, type_kind::string> {
     static std::string doit(const T& value) {
-        std::stringstream ss;
-        ss << '"' << value << '"';
-        return ss.str();
+        std::string res(1, '"');
+        for (char c : std::string(value)) {
+            switch (c) {
+                case '\"': res += "\\\""; break;
+                case '\n': res += "\\n" ; break;
+                case '\r': res += "\\r" ; break;
+                default  : res += c;
+            }
+        }
+        res += '"';
+        return res;
     }
 };
 
@@ -51,13 +64,18 @@ struct to_string_impl<T, type_kind::sequence_container> {
     static std::string doit(const T& value) {
         std::string res = "[";
         bool first = true;
-        for (auto& v : value) {
-            if (first) res += ", ";
-            else first = false;
-            res += to_string_impl<T>::doit(v);
+        for (const auto& v : value) {
+            if (first) first = false;
+            else res += ", ";
+            res += to_string(v);
         }
         return res + "]";
     }
+};
+
+template <int N>
+struct to_string_impl<char[N], type_kind::sequence_container> : to_string_impl<char[N], type_kind::string>
+{
 };
 
 template <class T>
@@ -66,11 +84,11 @@ struct to_string_impl<T, type_kind::map> {
         std::string res = "{";
         bool first = true;
         for (auto& kv : value) {
-            if (first) res += ", ";
-            else first = false;
-            res += to_string_impl<T>::doit(kv.first);
+            if (first) first = false;
+            else res += ", ";
+            res += to_string(kv.first);
             res += ": ";
-            res += to_string_impl<T>::doit(kv.second);
+            res += to_string(kv.second);
         }
         return res + "}";
     }
@@ -82,9 +100,9 @@ struct to_string_impl<T, type_kind::set> {
         std::string res = "{";
         bool first = true;
         for (auto& v : value) {
-            if (first) res += ", ";
-            else first = false;
-            res += to_string_impl<T>::doit(v);
+            if (first) first = false;
+            else res += ", ";
+            res += to_string(v);
         }
         return res + "}";
     }
@@ -93,7 +111,7 @@ struct to_string_impl<T, type_kind::set> {
 template <class T>
 struct to_string_impl<T, type_kind::pair> {
     static std::string doit(const T& value) {
-        return "(" + to_string_impl<T>::doit(value.first) + ", " + to_string_impl<T>::doit(value.second) + ")";
+        return "(" + to_string(value.first) + ", " + to_string(value.second) + ")";
     }
 };
 
@@ -106,7 +124,7 @@ struct to_string_impl<std::nullptr_t, type_kind::unknown> {
 
 template <class T>
 inline std::string to_string(const T& value) {
-    return detail::to_string_impl<T>::doit(value);
+    return detail::to_string_impl<T, type_kind_of<T>>::doit(value);
 }
 
 }}}  // namespace cp::diagnostics::detail

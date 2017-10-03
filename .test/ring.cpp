@@ -5,7 +5,7 @@
 
 using namespace cp;
 
-TEST("static_quotient_ring:arithmetic", N=1000, TL=1s) {
+TEST("static_quotient_ring:arithmetic", repeat=1000, time_limit=1s) {
     using ring = static_quotient_ring<18446744073709551557ull>;  // largest prime that fit uint64_t type
     using int_mod = ring_element<ring>;
     int_mod x = random1() % ring::mod();

@@ -4,6 +4,7 @@
 #include <cp/diagnostics/detail/split_va_args.hpp>
 #include <cp/string/split.hpp>
 #include <cp/string/trim.hpp>
+#include <cp/lexical_cast.hpp>
 
 #include <iostream>
 #include <cmath>
@@ -16,11 +17,11 @@
 	struct cn : cp::tests::detail::test_base {                      \
         const char* filename() const override { return __FILE__; }  \
         const char* args() const override { return as; }            \
-        void body() const override;                                 \
+        void body(int) const override;                              \
         cn() { cp::tests::detail::all_tests().push_back(this); }    \
         static cn initializer;                                      \
     } cn::initializer;                                              \
-    inline void cn::body() const
+    inline void cn::body(int run_num) const
 
 #define TEST(...)                   TEST_IMPL(CONCATENATE(_tesT_, __COUNTER__), #__VA_ARGS__)
 
@@ -81,12 +82,16 @@ inline void assert_throws(const char* filename, int line, const F& f) {
     throw ss.str();
 }
 
+static const char* repeat_key = "repeat";
+static const char* time_limit_key = "time_limit";
+
 struct test_base {
     virtual const char* filename() const = 0;
     virtual const char* args() const = 0;
-    virtual void body() const = 0;
+    virtual void body(int run_num) const = 0;
     
     bool run() {
+        using diagnostics::detail::to_string;
         try {
             auto args = diagnostics::detail::split_va_args(this->args());
             for (auto& v : args) {
@@ -95,8 +100,28 @@ struct test_base {
             auto name = args.empty() ? "" : args[0];
             if (name.size() > 2 && name.front() == '"' && name.back() == '"')
                 name = name.substr(1, name.size() - 2);
-            std::cerr << "[" << name << "]: ";
-            body();
+            std::map<std::string, std::string> params;
+            for (size_t i = 1; i < args.size(); ++i) {
+                auto kv = split(args[i], '=');
+                if (kv.size() != 2) continue;
+                params[trim(kv[0])] = trim(kv[1]);
+            }
+            std::cerr << name << ": ";
+            auto try_get_param = [&params](const char* key, auto& value) -> bool {
+                auto it = params.find(key);
+                if (it == params.end()) return false;
+                if (!TRY_ASSIGN(value, lexical_cast<std::decay_t<decltype(value)>>(it->second))) {
+                    throw "invalid value " + to_string(it->second) + " for param " + to_string(key);
+                }
+                return true;
+            };
+            int repeat = 1;
+            double time_limit = 60;
+            try_get_param(repeat_key, repeat);
+            try_get_param(time_limit_key, time_limit);
+            for (int k = 0; k < repeat; ++k) {
+                body(k);
+            }
             std::cerr << "passed" << std::endl;
             return true;
         } catch (const std::string& fail_message) {
