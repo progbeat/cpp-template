@@ -1,3 +1,4 @@
+#define random  stdlib_random
 #include <unordered_map>
 #include <unordered_set>
 #include <stdexcept>
@@ -10,6 +11,7 @@
 #include <array>
 #include <map>
 #include <set>
+#undef random
 
 #define UN(v) sort(all(v)), (v).erase(unique(all(v)), (v).end())
 #define FOR(i, a, b) for (decltype(a) i(a), _B_##i(b); i < _B_##i; ++i)
@@ -22,7 +24,5 @@
 #define pb push_back
 #define Y second
 #define X first
-
-#define TRY_ASSIGN(x, y)   [&] { try { x = (y); return true; } catch (...) { return false; } }()
 
 // using namespace std;

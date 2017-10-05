@@ -5,12 +5,12 @@
 
 using namespace cp;
 
-TEST("static_quotient_ring:arithmetic", repeat=1000, time_limit=1s) {
-    using ring = static_quotient_ring<18446744073709551557ull>;  // largest prime that fit uint64_t type
+TEST("static_quotient_ring:arithmetic", repeat=1000, time_limit=1) {
+    using ring = static_quotient_ring<18446744073709551557ull>;  // largest uint64_t prime number
     using int_mod = ring_element<ring>;
-    int_mod x = random1() % ring::mod();
-    int_mod y = random1() % ring::mod();
-    int_mod z = random1() % (ring::mod() - 1) + 1;
+    int_mod x = random.uniform(ring::mod());
+    int_mod y = random.uniform(ring::mod());
+    int_mod z = random.uniform(ring::mod() - 1) + 1;
     ASSERT_EQUAL(x + y, y + x);
     ASSERT_EQUAL(x + (y + z), (x + y) + z);
     ASSERT_EQUAL(int_mod(), x + (-x));

@@ -17,10 +17,7 @@ struct lexical_cast_impl<std::string, U> {
 template <class T>
 struct lexical_cast_impl<T, std::string> {
     static T doit(const std::string& str) {
-        T res = T();
-        std::stringstream ss(str);
-        ss >> res;
-        return res;
+        return lexical_cast_impl<T, char*>::doit(str.data());
     }
 };
 

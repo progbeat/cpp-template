@@ -5,8 +5,12 @@
 #include <cp/string/split.hpp>
 #include <cp/string/trim.hpp>
 #include <cp/lexical_cast.hpp>
+#include <cp/utility.hpp>
+#include <cp/random.hpp>
+#include <cp/time.hpp>
 
 #include <iostream>
+#include <iomanip>
 #include <cmath>
 #include <map>
 
@@ -16,12 +20,13 @@
 #define TEST_IMPL(cn, as)                                           \
 	struct cn : cp::tests::detail::test_base {                      \
         const char* filename() const override { return __FILE__; }  \
+        int line() const override { return __LINE__; }              \
         const char* args() const override { return as; }            \
-        void body(int) const override;                              \
+        void body(cp::xoroshiro128plus&) const override;            \
         cn() { cp::tests::detail::all_tests().push_back(this); }    \
         static cn initializer;                                      \
     } cn::initializer;                                              \
-    inline void cn::body(int run_num) const
+    inline void cn::body(cp::xoroshiro128plus& random) const
 
 #define TEST(...)                   TEST_IMPL(CONCATENATE(_tesT_, __COUNTER__), #__VA_ARGS__)
 
@@ -87,12 +92,15 @@ static const char* time_limit_key = "time_limit";
 
 struct test_base {
     virtual const char* filename() const = 0;
+    virtual int line() const = 0;
     virtual const char* args() const = 0;
-    virtual void body(int run_num) const = 0;
+    virtual void body(xoroshiro128plus& random) const = 0;
     
     bool run() {
         using diagnostics::detail::to_string;
+        cp::stopwatch stopwatch;
         try {
+            cp::xoroshiro128plus random(args());
             auto args = diagnostics::detail::split_va_args(this->args());
             for (auto& v : args) {
                 v = trim(v);
@@ -100,32 +108,50 @@ struct test_base {
             auto name = args.empty() ? "" : args[0];
             if (name.size() > 2 && name.front() == '"' && name.back() == '"')
                 name = name.substr(1, name.size() - 2);
-            std::map<std::string, std::string> params;
+            std::map<std::string, std::pair<std::string, std::string>> params;
             for (size_t i = 1; i < args.size(); ++i) {
                 auto kv = split(args[i], '=');
                 if (kv.size() != 2) continue;
-                params[trim(kv[0])] = trim(kv[1]);
+                params[trim(kv[0])] = {trim(kv[1]), args[i]};
             }
             std::cerr << name << ": ";
-            auto try_get_param = [&params](const char* key, auto& value) -> bool {
+            auto try_get_param = [&params, this](const char* key, auto& value) -> bool {
                 auto it = params.find(key);
                 if (it == params.end()) return false;
-                if (!TRY_ASSIGN(value, lexical_cast<std::decay_t<decltype(value)>>(it->second))) {
-                    throw "invalid value " + to_string(it->second) + " for param " + to_string(key);
+                if (!TRY_ASSIGN(value, lexical_cast<std::decay_t<decltype(value)>>(it->second.first))) {
+                    throw "param " + to_string(key) + " has invalid value " + to_string(it->second.first) +
+                          "; line = " + to_string(line());
                 }
+                params.erase(it);
                 return true;
             };
             int repeat = 1;
             double time_limit = 60;
             try_get_param(repeat_key, repeat);
             try_get_param(time_limit_key, time_limit);
-            for (int k = 0; k < repeat; ++k) {
-                body(k);
+            if (!params.empty()) {
+                std::string unknown_params;
+                for (auto& kv : params) {
+                    if (!unknown_params.empty()) unknown_params += ", ";
+                    unknown_params += kv.second.second;
+                }
+                throw "unknown param" + ((params.size() > 1 ? "s: " : ": ") + unknown_params) + 
+                      "; line = " + to_string(line());
             }
-            std::cerr << "passed" << std::endl;
+            stopwatch.start();
+            for (int k = 0; k < repeat; ++k) {
+                body(random);
+            }
+            double elapsed_seconds = stopwatch.seconds();
+            if (elapsed_seconds > time_limit) {
+                throw "time limit exceeded; line = " + to_string(line());
+            }
+            std::cerr << "passed [ET = " << std::fixed << std::setprecision(3) << elapsed_seconds << "s]" << std::endl;
             return true;
         } catch (const std::string& fail_message) {
-            std::cerr << "failed: " << fail_message << std::endl;
+            double elapsed_seconds = stopwatch.seconds();
+            std::cerr << "failed: " << fail_message 
+                      << " [ET = " << std::fixed << std::setprecision(3) << elapsed_seconds << "s]" << std::endl;
             return false;
         }
     }
