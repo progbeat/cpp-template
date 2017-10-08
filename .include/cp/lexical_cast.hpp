@@ -1,5 +1,10 @@
 #pragma once
 
+#include <sstream>
+#include <string>
+
+namespace cp {
+
 namespace detail {
 
 template <class T, class U>
@@ -36,5 +41,7 @@ struct lexical_cast_impl<T, char*> {
 
 template <class T, class U>
 inline T lexical_cast(const U& value) {
-    return detail::lexical_cast_impl<T, std::decay_t<U>>::doit(value);
+    return cp::detail::lexical_cast_impl<T, std::decay_t<U>>::doit(value);
 }
+
+}  // namespace cp

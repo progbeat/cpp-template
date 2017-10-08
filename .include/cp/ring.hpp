@@ -1,5 +1,9 @@
 #pragma once
 
+#include <type_traits>
+#include <iostream>
+#include <cstdint>
+
 namespace cp {
 
 template <class Z, bool Static = false>
@@ -161,7 +165,7 @@ struct ring_element : Ring {
     }
 
     void check() const {
-        assert(0 <= value && value < Mod);
+        assert(0 <= value && value < ring().mod());
     }
 };
 

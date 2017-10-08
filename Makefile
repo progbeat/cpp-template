@@ -10,11 +10,13 @@ endif
 MAKEFILE_PATH   := $(realpath $(lastword $(MAKEFILE_LIST)))
 ROOT_DIR        := $(realpath $(dir $(lastword $(MAKEFILE_LIST))))
 BIN_DIR         := $(ROOT_DIR)/.bin
+SRC_DIR         := $(ROOT_DIR)/.src
 INCLUDE_DIR     := $(ROOT_DIR)/.include
 PROBLEM_DIR     := $(realpath $(dir $(TARGET_CPP)))
 PROBLEM_NAME    := $(basename $(notdir $(TARGET_CPP)))
 INPUT_FILE      := $(PROBLEM_DIR)/$(PROBLEM_NAME).in
 DO_NOTHING      := @echo > /dev/null
+EMPTY_CPP       := -x c++ /dev/null
 
 CXX             ?= c++
 DEBUG           ?= 0
@@ -32,7 +34,7 @@ ifneq ($(wildcard $(INPUT_FILE)),)
     LANCH_ARGS = < $(INPUT_FILE)
 endif 
 
-ifneq ($(patsubst .%,.,$(notdir $(PROBLEM_DIR))),.)
+ifneq ($(patsubst .%,.,$(notdir $(realpath $(dir $(PROBLEM_DIR))))),.)
 	FOR_SUBMIT ?= 1
 endif
 
@@ -46,7 +48,7 @@ TEMPLATE_HPP = $(INCLUDE_DIR)/cp/template.hpp
 CXXSTANDARD = -std=c++14
 CXXFLAGS += -march=native $(CXXSTANDARD) -Wall -fno-fast-math $(OPTIMIZATION_LEVEL) $(DEFINITIONS) $(INCLUDES)
 
-COMPILE = $(CXX) -include $(TEMPLATE_HPP) $(1) -o $(BIN_DIR)/$(2) $(CXXFLAGS) $(LDFLAGS) $(LDLIBS)
+SOURCE_FILES = $(addprefix -include ,$(wildcard $(SRC_DIR)/cp/*.cpp)) $(EMPTY_CPP)
 
 ifeq ($(FOR_SUBMIT),1)
 	RUN_CXX_PREPROCESSOR = $(CXX) $(TARGET_CPP) $(CXXSTANDARD) -DONLINE_JUDGE -I.include -E -C -P
@@ -64,7 +66,7 @@ $(BIN_DIR)/$(PROBLEM_NAME): $(BIN_DIR) $(TARGET_CPP)
 	@clear
 	@-echo Compiling "$(TARGET_CPP)"...
 	@-rm $(SUBMIT_CPP) 2> /dev/null || true
-	@$(CXX) -include $(TEMPLATE_HPP) $(TARGET_CPP) -o $@ $(CXXFLAGS) $(LDFLAGS) $(LDLIBS)
+	@$(CXX) -include $(TEMPLATE_HPP) -include $(TARGET_CPP) $(SOURCE_FILES) -o $@ $(CXXFLAGS) $(LDFLAGS) $(LDLIBS)
 
 $(SUBMIT_CPP): $(TARGET_CPP) $(BIN_DIR)/$(PROBLEM_NAME)
 	@$(MAKE_SUBMIT_CPP)
