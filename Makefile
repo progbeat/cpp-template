@@ -45,7 +45,7 @@ endif
 INCLUDES = -I$(INCLUDE_DIR)
 TEMPLATE_HPP = $(INCLUDE_DIR)/cp/template.hpp
 
-CXXSTANDARD = -std=c++14
+CXXSTANDARD = -std=c++1z
 CXXFLAGS += -march=native $(CXXSTANDARD) -Wall -fno-fast-math $(OPTIMIZATION_LEVEL) $(DEFINITIONS) $(INCLUDES)
 
 SOURCE_FILES = $(addprefix -include ,$(wildcard $(SRC_DIR)/cp/*.cpp)) $(EMPTY_CPP)

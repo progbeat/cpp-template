@@ -33,8 +33,10 @@ struct rng_decorator : public Rng {
     T uniform() {
         constexpr size_t n = sizeof(typename Rng::result_type);
         T r = (T)base()();
-        for (size_t i = 0; (i += n) < sizeof(T); ) {
-            r = (r << (n * CHAR_BIT)) | base()();
+        if constexpr (n < sizeof(T)) {
+            for (size_t i = 0; (i += n) < sizeof(T); ) {
+                r = (r << (n * CHAR_BIT)) ^ base()();
+            }
         }
         return r ^ (r >> (sizeof(T) * CHAR_BIT - 1));
     }
