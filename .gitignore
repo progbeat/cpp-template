@@ -1,6 +1,8 @@
 /.bin
 *.submit.cpp
 
+/.vscode/settings.json
+
 # Compiled Object files
 *.slo
 *.lo

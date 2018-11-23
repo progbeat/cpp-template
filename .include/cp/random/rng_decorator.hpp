@@ -27,6 +27,19 @@ struct rng_decorator : public Rng {
     T uniform(T to) { return uniform(T(), to); }
 
     /**
+     * Generates uniform non-negative random integer number of type @p T.
+     */
+    template <class T>
+    T uniform() {
+        constexpr size_t n = sizeof(typename Rng::result_type);
+        T r = (T)base()();
+        for (size_t i = 0; (i += n) < sizeof(T); ) {
+            r = (r << (n * CHAR_BIT)) | base()();
+        }
+        return r ^ (r >> (sizeof(T) * CHAR_BIT - 1));
+    }
+
+    /**
      * Generates normal (Gaussian) random number with mean = @p mean and stddev = @p stddev.
      */
     template <class T = double>
