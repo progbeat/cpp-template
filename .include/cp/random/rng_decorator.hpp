@@ -31,12 +31,10 @@ struct rng_decorator : public Rng {
      */
     template <class T>
     T uniform() {
-        constexpr size_t n = sizeof(typename Rng::result_type);
+        constexpr size_t n = sizeof(typename Rng::result_type) % sizeof(T);
         T r = (T)base()();
-        if constexpr (n < sizeof(T)) {
-            for (size_t i = 0; (i += n) < sizeof(T); ) {
-                r = (r << (n * CHAR_BIT)) ^ base()();
-            }
+        for (size_t i = 0; (i += n) < sizeof(T); ) {
+            r = (r << (n * CHAR_BIT)) ^ base()();
         }
         return r ^ (r >> (sizeof(T) * CHAR_BIT - 1));
     }
