@@ -31,7 +31,7 @@ endif
 
 # If input file exists redirect input to it.
 ifneq ($(wildcard $(INPUT_FILE)),) 
-    LANCH_ARGS = < $(INPUT_FILE)
+	LANCH_ARGS = < $(INPUT_FILE)
 endif 
 
 ifneq ($(patsubst .%,.,$(notdir $(realpath $(dir $(PROBLEM_DIR))))),.)
@@ -80,4 +80,3 @@ submit.cpp: $(SUBMIT_CPP)
 launch: build
 	@clear
 	@cd $(BIN_DIR) && time $(BIN_DIR)/$(PROBLEM_NAME) $(LANCH_ARGS)
-
