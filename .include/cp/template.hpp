@@ -9,6 +9,7 @@
 #include <vector>
 #include <random>
 #include <array>
+#include <regex>
 #include <map>
 #include <set>
 #undef random

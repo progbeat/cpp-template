@@ -1,6 +1,7 @@
 #pragma once
 
 #include <type_traits>
+#include <climits>
 #include <random>
 
 namespace cp {

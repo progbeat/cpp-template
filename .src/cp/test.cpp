@@ -132,6 +132,12 @@ int run(int argc, const char* argv[]) {
                 break;
             }
     }
+    for (; common_prefix_size > 0; --common_prefix_size) {
+        char c = common_prefix[common_prefix_size];
+        if (c == '/' || c == '\\') {
+	    break;
+        }
+    }
     int num_ok = 0;
     for (auto file_and_tests : tests_per_file) {
         auto filename = file_and_tests.first.substr(common_prefix_size);
